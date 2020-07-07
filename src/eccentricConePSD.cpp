@@ -1,12 +1,16 @@
 #include "eccentricCone.h"
+#include "eccentricConePSD.h"
 #include <maya/MMatrix.h>
 #include <maya/MPoint.h>
 #include <maya/MVector.h>
+#include <maya/MTypeID.h>
 #include <maya/MFnNumericAttribute.h>
+#include <maya/MFnUnitAttribute.h>
 #include <maya/MFnMatrixAttribute.h>
 #include <maya/MRampAttribute.h>
 
-MObject EccentricConePSDNode::id(0x000000000);
+MTypeId EccentricConePSDNode::id(0x00122709);
+MString EccentricConePSDNode::kName = "eccentricConePSD";
 
 MObject EccentricConePSDNode::aOuterMatrix;
 MObject EccentricConePSDNode::aInnerMatrix;
@@ -54,7 +58,7 @@ MStatus EccentricConePSDNode::initialize(){
     CHECK_MSTATUS_AND_RETURN_IT(stat);
 	aSamplePointZ = fnUnit.create("pointZ", "pz", MFnUnitAttribute::kDistance, 0.0, &stat);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
-	aSamplePoint = fnNum.create("point", "p", samplePointX, samplePointY, samplePointZ, &stat);
+	aSamplePoint = fnNum.create("point", "p", aSamplePointX, aSamplePointY, aSamplePointZ, &stat);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
     stat = addAttribute(aSamplePoint);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
@@ -65,7 +69,7 @@ MStatus EccentricConePSDNode::initialize(){
     CHECK_MSTATUS_AND_RETURN_IT(stat);
 
     // Output Attribute
-    aOutputValue = fnNum.create("value", "v", MFnNumericAttribute::kFloat, 0.0, &stat);
+    aOutputValue = fnNum.create("value", "v", MFnNumericData::kFloat, 0.0, &stat);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
     stat = addAttribute(aOutputValue);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
@@ -105,7 +109,7 @@ MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
     // Calculate the value
     float outValue = 0.0, rampValue;
     MPoint sect;
-    bool wrongSide = vecPlaneIntersect(outerMat, pt, sect);
+    bool wrongSide = vecPlaneIntersect(outerMat, pt, sect, 1);
     if (!wrongSide){
         outValue = eccentricEllipseFalloff(sect, innerMat, outerMat);
     }
@@ -117,7 +121,7 @@ MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
 
     // set the output plug
     MDataHandle outHandle = block.outputValue(aOutputValue);
-    outHandle.set(rampValue);
+    outHandle.set(outValue);
     block.setClean(plug);
     return MStatus::kSuccess;
 }

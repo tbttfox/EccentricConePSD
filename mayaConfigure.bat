@@ -1,25 +1,20 @@
 setlocal
+REM "A quick batch file with variable options to kick off a cmake build on Windows"
 
-@echo off
-FOR %%G IN (2019) DO (call :subroutine "%%G")
-GOTO end
+SET MAYA_VERSION=2019
+SET BUILD=mayabuild_%MAYA_VERSION%
+SET COMPILER=Visual Studio 15 2017 Win64
 
-:subroutine
-set builddir=mayabuild.%1
-if not exist %builddir% goto BUILDENV
-rmdir %builddir% /S /Q
-:BUILDENV
-mkdir %builddir%
-cd %builddir%
-if %1 LSS "2020" (
-    cmake -A x64 -T v140 -DMAYA_VERSION=%1 ../
-) ELSE (
-    cmake -A x64 -T v141 -DMAYA_VERSION=%1 ../
-)
-REM cmake --build . --target install --config Release
-cd ..
-goto :eof
+SET PFX=%~dp0
+cd %PFX%
+rmdir %BUILD% /s /q
+mkdir %BUILD%
+cd %BUILD%
 
-:end
+cmake ^
+    -DMAYA_VERSION=%MAYA_VERSION% ^
+    -G "%COMPILER%" ..\
+
+REM cmake --build . --config Release --target INSTALL
+
 pause
-

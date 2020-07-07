@@ -5,6 +5,7 @@
 #include <maya/MTypeId.h>
 #include <maya/MObject.h>
 #include <maya/MPlug.h>
+#include <maya/MString.h>
 #include <maya/MDataBlock.h>
 
 
@@ -18,9 +19,11 @@ class EccentricConePSDNode : public MPxNode {
         virtual MStatus compute(const MPlug& plug, MDataBlock& data) override;
 
         static MTypeId id;
+        static MString kName;
 
         static MObject aOuterMatrix;
         static MObject aInnerMatrix;
+        static MObject aReferenceInvMatrix;
         static MObject aSamplePoint;
         static MObject aSamplePointX;
         static MObject aSamplePointY;
