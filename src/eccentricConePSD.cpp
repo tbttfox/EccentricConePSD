@@ -21,7 +21,6 @@ MObject EccentricConePSDNode::aSamplePoint;
 MObject EccentricConePSDNode::aSamplePointX;
 MObject EccentricConePSDNode::aSamplePointY;
 MObject EccentricConePSDNode::aSamplePointZ;
-MObject EccentricConePSDNode::aFalloffRamp;
 MObject EccentricConePSDNode::aOutputValue;
 
 EccentricConePSDNode::EccentricConePSDNode() {}
@@ -65,11 +64,6 @@ MStatus EccentricConePSDNode::initialize(){
     stat = addAttribute(aSamplePoint);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
 
-    aFalloffRamp = rAttr.createCurveRamp("falloff", "fo", &stat);
-    CHECK_MSTATUS_AND_RETURN_IT(stat);
-    stat = addAttribute(aFalloffRamp);
-    CHECK_MSTATUS_AND_RETURN_IT(stat);
-
     // Output Attribute
     aOutputValue = fnNum.create("value", "v", MFnNumericData::kFloat, 0.0, &stat);
     CHECK_MSTATUS_AND_RETURN_IT(stat);
@@ -84,7 +78,6 @@ MStatus EccentricConePSDNode::initialize(){
     attributeAffects(aSamplePointX, aOutputValue);
     attributeAffects(aSamplePointY, aOutputValue);
     attributeAffects(aSamplePointZ, aOutputValue);
-    attributeAffects(aFalloffRamp, aOutputValue);
 
     return MStatus::kSuccess;
 }
