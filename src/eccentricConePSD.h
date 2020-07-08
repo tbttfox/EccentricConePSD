@@ -15,7 +15,6 @@ class EccentricConePSDNode : public MPxNode {
         virtual ~EccentricConePSDNode();
         static void* creator();
         static MStatus initialize();
-		virtual void postConstructor();
 
         virtual MStatus compute(const MPlug& plug, MDataBlock& data) override;
 
@@ -29,7 +28,6 @@ class EccentricConePSDNode : public MPxNode {
         static MObject aSamplePointX;
         static MObject aSamplePointY;
         static MObject aSamplePointZ;
-        static MObject aFalloffRamp;
         static MObject aOutputValue;
 };
 

@@ -90,25 +90,6 @@ MStatus EccentricConePSDNode::initialize(){
 }
 
 
-void EccentricConePSDNode::postConstructor() {
-	MRampAttribute ramp(thisMObject(), aFalloffRamp);
-
-	MFloatArray positions(2);
-	positions.set(0.0, 0);
-	positions.set(1.0, 1);
-
-	MFloatArray values(2);
-	values.set(0.0, 0);
-	values.set(1.0, 1);
-
-	MIntArray interps(2);
-	interps.set(1, 0);
-	interps.set(1, 1);
-
-	ramp.addEntries(positions, values, interps);
-}
-
-
 
 MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
     MStatus stat;
@@ -130,21 +111,16 @@ MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
     pt = pt * refInvMat;
 
     // Calculate the value
-    float outValue = 0.0, rampValue;
+	float outValue = 0.0;
     MPoint sect;
     bool wrongSide = vecPlaneIntersect(outerMat, pt, sect, 1);
     if (!wrongSide){
         outValue = eccentricEllipseFalloff(sect, innerMat, outerMat);
     }
 
-    // Apply the ramp
-    MRampAttribute ramp(thisMObject(), aFalloffRamp);
-    ramp.getValueAtPosition(outValue, rampValue, &stat);
-    CHECK_MSTATUS_AND_RETURN_IT(stat);
-
     // set the output plug
     MDataHandle outHandle = block.outputValue(aOutputValue);
-    outHandle.set(rampValue);
+    outHandle.set(outValue);
     block.setClean(plug);
     return MStatus::kSuccess;
 }
