@@ -27,32 +27,22 @@ bool vecPlaneIntersect(const MMatrix &planeMatrix, const MPoint &pt1, MPoint &re
 }
 
 
-
-
-
-MStatus intersectLineWithUnitCircle3(Float x1, Float y1, Float x2, Float y2, Float &ox, Float &oy) {
-	Float dx = x2 - x1;
-	Float dy = y2 - y1;
-
-	Float dpd = dx*x1 + dy*y1;
-	Float dlen2 = dx*dx + dy*dy;
-	Float plen2 = x1*x1 + y1*y1;
-
-	Float disc = dpd*dpd - dlen2*(plen2 - 1);
-	if (disc < 0) return;
-	disc = sqrt(disc);
-
-	Float t1 = (-dpd + disc) / dlen2;
-	Float t2 = (-dpd - disc) / dlen2;
-
-    Float ret = ((0 <= t1) && (t1 <= 1)) ? t1 : t2;
-    ox = dx*ret + x1;
-    oy = dy*ret + y1;
+MStatus intersectLineWithUnitCircle(Float x2, Float y2, Float x1, Float y1, Float &ox, Float &oy) {
+	Float vx = x1 - x2;
+	Float vy = y1 - y2;
+	Float v2 = 2 * (vx*vx + vy*vy);
+	Float aa = 2 * (x1*vx + y1*vy);
+	Float bb = 2 * v2 * ((x1*x1 + y1*y1) - 1);
+	Float disc = aa * aa - bb;
+	if (disc < 0) return MStatus::kFailure;
+	Float t = (sqrt(disc) - aa) / v2;
+	ox = t * vx + x1;
+	oy = t * vy + y1;
+	return MStatus::kSuccess;
 }
 
 
-
-MStatus intersectLineWithUnitCircle3(const MPoint &pt0, const MPoint &pt1, MPoint &out, UINT normalAxis){
+MStatus intersectLineWithUnitCircle(const MPoint &pt0, const MPoint &pt1, MPoint &out, UINT normalAxis){
 	UINT c1 = 0, c2 = 1;
 	switch (normalAxis) {
 	case 0:
@@ -62,72 +52,24 @@ MStatus intersectLineWithUnitCircle3(const MPoint &pt0, const MPoint &pt1, MPoin
 	}
 
 	Float retX, retY;
-	intersectLineWithUnitCircle3(pt0[c1], pt0[c2], pt1[c1], pt1[c2], retX, retY);
+	MStatus ret = intersectLineWithUnitCircle(pt0[c1], pt0[c2], pt1[c1], pt1[c2], retX, retY);
+	if (!ret) return ret;
 	Float retZ = 0;
 
 	switch (normalAxis) {
 	case 1:
 		std::swap(retY, retZ);
+		break;
 	case 0:
-		std::swap(retX, retY);
-	}
-    out = MPoint(retX, retY, retZ);
-    return MStatus::kSuccess;
-}
-
-
-
-
-
-
-
-MStatus intersectLineWithUnitCircle(const MPoint &pt0, const MPoint &pt1, MPoint &out, UINT normalAxis){
-
-	// Dropthrough is intended
-	UINT c1 = 0, c2 = 1;
-	switch (normalAxis) {
-	case 0:
-		c1 = 1;
-	case 1:
-		c2 = 2;
-	}
-
-    Float x0 = pt0[c1];
-    Float x1 = pt1[c1];
-    Float y0 = pt0[c2];
-    Float y1 = pt1[c2];
-
-    Float dx = x1 - x0;
-    Float dy = y1 - y0;
-
-    Float a = dx*dx + dy*dy;
-    Float b = 2*dx*x0 + 2*dy*y0;
-    Float c = x0*x0 - y0*y0 - 1;
-
-    Float disc = b*b - 4*a*c;
-    if (disc < 0){
-        out = MPoint();
-        return MStatus::kFailure;
-    }
-    disc = sqrt(disc);
-
-    // use a more stable variation of the quadratic formula
-    Float t1 = 2 * c / (-b + disc);
-    Float t2 = 2 * c / (-b - disc);
-
-    Float ret = ((0 <= t1) && (t1 <= 1)) ? t1 : t2;
-    Float retX = dx*ret + x0;
-    Float retY = dy*ret + y0;
-	Float retZ = 0;
-	switch (normalAxis) {
-	case 1:
 		std::swap(retY, retZ);
-	case 0:
 		std::swap(retX, retY);
+		break;
 	}
     out = MPoint(retX, retY, retZ);
-    return MStatus::kSuccess;
+	return ret;
 }
+
+
 
 Float eccentricEllipseFalloff(const MPoint &vertPos, const MMatrix &innerMat, const MMatrix &outerMat){
     MMatrix innerMatInv = innerMat.inverse();
@@ -168,9 +110,3 @@ Float eccentricEllipseFalloff(const MPoint &vertPos, const MMatrix &innerMat, co
     Float dist2 = (vertInnerN - res).length();
     return 1.0 - (dist1 / dist2);
 }
-
-
-
-
-
-
