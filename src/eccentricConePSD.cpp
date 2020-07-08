@@ -8,6 +8,8 @@
 #include <maya/MFnUnitAttribute.h>
 #include <maya/MFnMatrixAttribute.h>
 #include <maya/MRampAttribute.h>
+#include <maya/MFloatArray.h>
+#include <maya/MIntArray.h>
 
 MTypeId EccentricConePSDNode::id(0x00122709);
 MString EccentricConePSDNode::kName = "eccentricConePSD";
@@ -87,6 +89,27 @@ MStatus EccentricConePSDNode::initialize(){
     return MStatus::kSuccess;
 }
 
+
+void EccentricConePSDNode::postConstructor() {
+	MRampAttribute ramp(thisMObject(), aFalloffRamp);
+
+	MFloatArray positions(2);
+	positions.set(0.0, 0);
+	positions.set(1.0, 1);
+
+	MFloatArray values(2);
+	values.set(0.0, 0);
+	values.set(1.0, 1);
+
+	MIntArray interps(2);
+	interps.set(1, 0);
+	interps.set(1, 1);
+
+	ramp.addEntries(positions, values, interps);
+}
+
+
+
 MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
     MStatus stat;
 
@@ -121,7 +144,7 @@ MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
 
     // set the output plug
     MDataHandle outHandle = block.outputValue(aOutputValue);
-    outHandle.set(outValue);
+    outHandle.set(rampValue);
     block.setClean(plug);
     return MStatus::kSuccess;
 }

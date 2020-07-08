@@ -1,0 +1,10 @@
+global proc AECorneaBulgeImplicitTemplate(string $nodeName){
+    editorTemplate -beginScrollLayout;
+    AEaddRampControl ($nodeName+".falloff");
+    editorTemplate -endLayout;
+
+    AEdependNodeTemplate $nodeName;
+    editorTemplate -addExtraControls;
+    
+    editorTemplate -endScrollLayout;
+}
