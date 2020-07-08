@@ -1,4 +1,4 @@
-global proc AECorneaBulgeImplicitTemplate(string $nodeName){
+global proc AEeccentricConePSDTemplate(string $nodeName){
     editorTemplate -beginScrollLayout;
     AEaddRampControl ($nodeName+".falloff");
     editorTemplate -endLayout;
