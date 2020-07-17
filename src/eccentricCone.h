@@ -23,7 +23,7 @@ bool linePlaneIntersect(const MMatrix &planeMatrix, const MPoint &pt1, const MPo
 }
 
 bool vecPlaneIntersect(const MMatrix &planeMatrix, const MPoint &pt1, MPoint &ret, UINT normalAxis){
-	return linePlaneIntersect(planeMatrix, pt1, MPoint(), ret, normalAxis);
+	return linePlaneIntersect(planeMatrix, MPoint(), pt1, ret, normalAxis);
 }
 
 
@@ -93,8 +93,8 @@ Float eccentricEllipseFalloff(const MPoint &vertPos, const MMatrix &innerMat, co
     // Draw a line between that found center, and the point
     // Then intersect it with the outer circle
     MPoint circInt;
-	//MStatus stat = intersectLineWithUnitCircle(vertOuter, insideTran, circInt, 1);
-    MStatus stat = intersectLineWithUnitCircle(insideTran, vertOuter, circInt, 1);
+	//MStatus stat = intersectLineWithUnitCircle(vertOuter, insideTran, circInt, 0);
+    MStatus stat = intersectLineWithUnitCircle(insideTran, vertOuter, circInt, 0);
     if (!stat)return 0.0;
 
     // And put it back into worldspace

@@ -106,7 +106,7 @@ MStatus EccentricConePSDNode::compute(const MPlug& plug, MDataBlock& block){
     // Calculate the value
 	float outValue = 0.0;
     MPoint sect;
-    bool wrongSide = vecPlaneIntersect(outerMat, pt, sect, 1);
+    bool wrongSide = vecPlaneIntersect(outerMat, pt, sect, 0);
     if (!wrongSide){
         outValue = eccentricEllipseFalloff(sect, innerMat, outerMat);
     }
